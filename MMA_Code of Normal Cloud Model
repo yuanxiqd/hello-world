@@ -1,0 +1,9 @@
+这个文件是用来存储使用MMA编写的正太云模型的代码的
+2018年4月25日
+乔东
+
+ListPlot[{#Ex, Exp[-(#Ex - 30)^2/(2*#En^2)]} & /@ 
+  Table[<|"Ex" -> RandomReal[NormalDistribution[#1, #2]], 
+      "En" -> #2|> &[30, RandomReal[NormalDistribution[5, 1]]], 1000],
+  AxesStyle -> Arrowheads[0.03], PlotStyle -> Blue, 
+ Ticks -> {Table[n, {n, 15, 45, 5}], Automatic}]
