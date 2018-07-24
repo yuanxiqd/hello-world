@@ -1,0 +1,10 @@
+(*拉格朗日乘子法求概率分布*)
+X = {1, 2, 3, 4, 5};
+P = {p1, p2, p3, p4, p5};
+U = {0, 0.5, 1, 0.5, 0};
+L = {l1, l2, l3};
+f = -P.(Log[#] & /@ P) + L.{X.P - 3, U.P - 0.2, Total[P] - 1};(*目标函数*)
+Lexp = Join[D[f, #] == 0 & /@ P, D[f, #] == 0 & /@ L];(*拉格朗日乘子法的偏导条件*)
+S = FindInstance[Lexp, Join[P, L], Reals];(*联立偏导条件方程组求解*)
+J = Values[Association[S[[1]]]];
+T = Take[J, 5]
