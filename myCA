@@ -1,0 +1,325 @@
+(*基本程序开始*)
+(*Content: 此脚本用以执行基于Z数之交叉熵的VIKOR方法;
+Author: Dong Qiao;
+Date: 2018-8-15;
+*)
+(*Input: Cs-Information Size; Decision Matrix;
+Output: Ranking Sequence;
+*)
+(*--------------------------------------------------------以上是程序1部分------------------------------------------------------------*)
+\
+
+(*这部分脚本用来计算Z-numbers模糊性限制的交叉熵*)
+(*(*Func-01*)getUoFN[cfn_,x_]:=Module[{ncfn,r},
+(*构建梯形模糊数，并依自变量值而取出相应的隶属度值*)
+ncfn=If[Length[cfn]\[Equal]4,cfn,Insert[cfn,cfn[[2]],3]];\
+(*如果传入的第一个参数cfn是三角模糊数而不是梯形模糊数，则转换之*)
+r=If[x<ncfn[[1]],0,If[x\[GreaterEqual]ncfn[[1]]&&x<ncfn[[2]],(x-ncfn[[\
+1]])/(ncfn[[2]]-ncfn[[1]]),If[x\[GreaterEqual]ncfn[[2]]&&x\[LessEqual]\
+ncfn[[3]],1,If[x>ncfn[[3]]&&x\[LessEqual]ncfn[[4]],(ncfn[[4]]-x)/(\
+ncfn[[4]]-ncfn[[3]]),0]]]];
+r
+]
+(*Func-02*)getSV[cfn_,d_]:=Module[{bof,eof,stp,vsv,fsv,sv},
+(*获得第一个传入参数cfn的值策略向量和模糊策略向量*)
+bof=cfn[[1]];
+eof=cfn[[-1]];
+stp=(eof-bof)/(d-1);
+vsv=Table[bof+i*stp,{i,0,d-1}];
+fsv=Table[getUoFN[cfn,vsv[[i]]],{i,1,d}];
+sv=Join[{vsv},{fsv}];
+sv
+]*)
+(*(*Func-11*)getPjt[Au_]:=Module[{},
+(*获得离散模糊数之隶属度函数的中心对称变换*)
+1/2-Abs[#-1/2]&/@Au
+]*)
+(*Func-12*)getCsSV[Ax_, Cs_] := Module[{T},
+  (*针对策略向量Ax进行关于信息尺寸Cs的缩小*)
+  T = #/Cs & /@ Ax;
+  T
+  ]
+(*Func-13*)
+myZa[A_, B_, d_] := 
+ Module[{Cs = 1, laplace, Ax, Bx, Au, Bu,(*nAu,nBu,*)Em, Sa, Sb},
+  (*获得两个离散模糊数的交叉熵*)
+  laplace = 1/10000;(*拉普拉斯平滑参数*)
+  (*Cs:信息尺寸*)
+  Ax = getSV[A, d][[1]];(*获得A的值策略向量*)
+  Bx = getSV[B, d][[1]];(*获得B的值策略向量*)
+  Sa = getCsSV[Ax, Cs];(*经过信息尺寸缩小Cs的Ax的值策略向量*)
+  Sb = getCsSV[Bx, Cs];(*经过信息尺寸缩小Cs的Bx的值策略向量*)
+  Au = getSV[A, d][[2]];(*获得A的模糊策略向量*)
+  Bu = getSV[B, d][[2]];(*获得B的模糊策略向量*)
+  (*nAu=getPjt[Au];(*获得A的模糊策略向量的投影*)
+  nBu=getPjt[Bu];(*获得B的模糊策略向量的投影*)*)(*投影变换是不必要的-20180805-Dong Qiao*)
+  Em = Table[
+    Au[[i]]*Log[(Au[[i]] + laplace)/((Au[[i]] + Bu[[j]])/2 + 
+          laplace)] + (1 - Au[[i]])*
+      Log[(1 - Au[[i]] + laplace)/(1 - (Au[[i]] + Bu[[j]])/2 + 
+          laplace)], {i, 1, d}, {j, 1, d}];
+  (*NumberForm[Em//N//TableForm,{5,4}]*)
+  (*Join[Sa//N,Sb//N,{NumberForm[Sa.Em.Sb//N,{5,4}]}]*)
+  Sa.Em.Sb
+  ]
+(*Func-13*)myCEa[A_, B_, d_] := Module[{ICE0, ICE1, HCE},
+  (*获取两个Z数模糊性限制的正式交叉熵*)
+  ICE1 = Abs[myZa[A, B, d] - myZa[A, A, d]];
+  ICE0 = Abs[myZa[B, A, d] - myZa[B, B, d]];
+  HCE = ICE1 + ICE0;
+  HCE
+  ]
+(*--------------------------------------------------------以上是程序2部分------------------------------------------------------------*)
+\
+
+(*这部分脚本用来计算Z-numbers可靠性限制的交叉熵*)
+(*Func-01*)getUoFN[cfn_, x_] := Module[{ncfn, r},
+  (*构建梯形模糊数，并依自变量值而取出相应的隶属度值*)
+  ncfn = If[Length[cfn] == 4, cfn, 
+    Insert[cfn, cfn[[2]], 3]];(*如果传入的第一个参数cfn是三角模糊数而不是梯形模糊数，则转换之*)
+  r = If[x < ncfn[[1]], 0, 
+    If[x >= ncfn[[1]] && 
+      x < ncfn[[2]], (x - ncfn[[1]])/(ncfn[[2]] - ncfn[[1]]), 
+     If[x >= ncfn[[2]] && x <= ncfn[[3]], 1, 
+      If[x > ncfn[[3]] && 
+        x <= ncfn[[4]], (ncfn[[4]] - x)/(ncfn[[4]] - ncfn[[3]]), 0]]]];
+  r
+  ]
+(*Func-02*)getSV[cfn_, d_] := Module[{bof, eof, stp, vsv, fsv, sv},
+  (*获得第一个传入参数cfn的值策略向量和模糊策略向量*)
+  bof = cfn[[1]];
+  eof = cfn[[-1]];
+  stp = (eof - bof)/(d - 1);
+  vsv = Table[bof + i*stp, {i, 0, d - 1}];
+  fsv = Table[getUoFN[cfn, vsv[[i]]], {i, 1, d}];
+  sv = Join[{vsv}, {fsv}];
+  sv
+  ]
+(*Func-03*)
+myZp[Z_, b_, d_] := 
+ Module[{nb, X, P, U, L, Y, yU, f, Lexp, S, J, T, nP, obj},
+  (*拉格朗日乘子法求概率分布*)
+  (*Authot:Dong Qiao*)
+  (*Date:2018-07-24*)
+  nb = If[b == 0, 0.0001, If[b == 1, 0.9999, b]];
+  X = getSV[Z[[1]], d][[1]];(*获得A的值策略向量*)
+  P = Table[
+    Symbol[StringJoin["p", IntegerString[i]]], {i, 1, d}];(*获得概率分布向量*)
+
+  
+  U = getSV[Z[[1]], d][[2]];(*获得A的模糊策略向量*)
+  L = Table[
+    Symbol[StringJoin["l", IntegerString[i]]], {i, 1, 
+     3}];(*获得Lambda的系数向量*)
+  Y = getSV[Z[[2]], d][[1]];(*获得B的值策略向量*)
+  yU = getSV[Z[[2]], d][[2]];(*获得B的模糊策略向量*)
+  f = -P.(Log[#] & /@ P) + 
+    L.{X.P - X.U/Total[U], U.P - nb, Total[P] - 1};(*目标函数*)
+  Lexp = Join[D[f, #] == 0 & /@ P, 
+    D[f, #] == 0 & /@ L];(*拉格朗日乘子法的偏导条件*)
+  S = FindInstance[Lexp, Join[P, L], Reals];(*联立偏导条件方程组求解*)
+  J = Values[Association[S[[1]]]];
+  T = Take[J, d];
+  nP = NumberForm[#, {5, 4}] & /@ T;
+  obj = -T.(Log[#] & /@ T);
+  (*<|"PDF"\[Rule]nP,"obj"\[Rule]obj|>*)
+  (*Join[nP,{obj},X,{b}]*)
+  T
+  ]
+(*Func-04*)myZps[Z_, d_] := Module[{},
+  Table[myZp[Z, b, d], {b, Z[[2, 1]], 
+    Z[[2, 3]], (Z[[2, 3]] - Z[[2, 1]])/(d - 1)}]
+  ]
+(*Func-05*)getLOGpp[Xx_, Yy_] := Module[{Lpp, Hpp},
+  (*函数getCEc的子函数*)
+  Lpp = Log[Xx/Yy];
+  Hpp = Xx.Lpp;
+  Hpp
+  ]
+(*Func-06*)getCEc[X_, Y_] := Module[{CEc, d},
+  (*获得两组隐藏概率分布的交叉熵核*)
+  d = Length[X];(*X是方阵，所以它的长度即为它的维度*)
+  CEc = Table[getLOGpp[X[[i]], Y[[j]]], {i, d}, {j, d}];
+  CEc
+  ]
+(*Func-07*)myCEr[Z1_, Z2_, d_] := Module[{M1, M2, X, Y, CEc, CEr},
+  (*获取两个Z-number可靠性部分的交叉熵*)
+  M1 = getSV[Z1[[2]], d][[2]];(*产生Z1之B的模糊策略向量*)
+  M2 = getSV[Z2[[2]], d][[2]];(*产生Z2之B的模糊策略向量*)
+  X = myZps[Z1, d]; Y = myZps[Z2, d];(*避免重复执行myZps*)
+  CEc = getCEc[X, Y];
+  CEr = M1.CEc.M2;
+  CEr
+  ]
+(*Func-08*)myCEp[Z1_, Z2_, d_] := Module[{ICE0, ICE1, HCE},
+  (*获取两个Z数可靠性限制的正式交叉熵*)
+  ICE1 = Abs[myCEr[Z1, Z2, d] - myCEr[Z1, Z1, d]];
+  ICE0 = Abs[myCEr[Z2, Z1, d] - myCEr[Z2, Z2, d]];
+  HCE = ICE1 + ICE0;
+  HCE
+  ]
+(*--------------------------------------------------------以上是程序3部分------------------------------------------------------------*)
+\
+
+(*这部分脚本用来计算Z-numbers综合加权的交叉熵*)
+myCEz[Z1_, Z2_, w_] := Module[{tZ1, tZ2, CEz, d = 5},
+  (*获取Z-numbers综合加权的交叉熵*)
+  tZ1 = {{1, 3, 5}, Z1[[2]]};
+  tZ2 = {{1, 3, 5}, Z2[[2]]};
+  CEz = w*myCEa[Z1[[1]], Z2[[1]], d] + (1 - w)*myCEp[tZ1, tZ2, d];
+  CEz
+  ]
+
+(*--------------------------------------------------------以上是程序部分------------------------------------------------------------*)
+
+
+myEz[Z_, w_] := Module[{IE, d = 5},
+  (*获得Z-number的信息熵*)
+  IE = w*myZa[Z[[1]], Z[[1]], d] + (1 - w)*myCEr[Z, Z, d];
+  IE
+  ]
+(*--------------------------------------------------------附加：计算Z-\
+number的信息熵------------------------------------------------------------*)
+
+
+getNoFN[A_, n_, c_] := Module[{r},
+  (*对一个模糊数进行规范化，第二个参数n为信息尺寸，根据第三个参数c判断该模糊数是收益型的还是成本型的，0为收益型，非零为成本型*)
+  r = If[c == 0, A/n, 1 - Reverse[A]/n];
+  r
+  ]
+(*--------------------------------------------------------附加：决策矩阵规范化-----\
+-------------------------------------------------------*)
+getPoNE[M_, A_] := Module[{r},
+  (*计算不加和点积*)
+  r = M[[#]]*A[[#]] & /@ Table[i, {i, 1, Length[A]}];
+  r
+  ]
+(*--------------------------------------------------------附加：不加和点积-----\
+-------------------------------------------------------*)
+getCalloA[aname_, aid_] := Module[{r},
+  (*根据指定的方案字母和方案id取出数据*)
+  r = Symbol[ToString[aname] <> ToString[aid]];
+  r
+  ]
+(*--------------------------------------------------------附加：取出指定条件的方案\
+数据------------------------------------------------------------*)
+
+
+(*基本程序结束*)
+
+(*导入决策数据*)
+a1 = Import[
+   "G:\\MMA_DOCUMENT\\myp\\cal\\comparative_analysis\\a1.xlsx"];
+a2 = Import[
+   "G:\\MMA_DOCUMENT\\myp\\cal\\comparative_analysis\\a2.xlsx"];
+a3 = Import[
+   "G:\\MMA_DOCUMENT\\myp\\cal\\comparative_analysis\\a3.xlsx"];
+a4 = Import[
+   "G:\\MMA_DOCUMENT\\myp\\cal\\comparative_analysis\\a4.xlsx"];
+a5 = Import[
+   "G:\\MMA_DOCUMENT\\myp\\cal\\comparative_analysis\\a5.xlsx"];
+a6 = Import[
+   "G:\\MMA_DOCUMENT\\myp\\cal\\comparative_analysis\\a6.xlsx"];
+a7 = Import[
+   "G:\\MMA_DOCUMENT\\myp\\cal\\comparative_analysis\\a7.xlsx"];
+a8 = Import[
+   "G:\\MMA_DOCUMENT\\myp\\cal\\comparative_analysis\\a8.xlsx"];
+a9 = Import[
+   "G:\\MMA_DOCUMENT\\myp\\cal\\comparative_analysis\\a9.xlsx"];
+a10 = Import[
+   "G:\\MMA_DOCUMENT\\myp\\cal\\comparative_analysis\\a10.xlsx"];
+a11 = Import[
+   "G:\\MMA_DOCUMENT\\myp\\cal\\comparative_analysis\\a11.xlsx"];
+a12 = Import[
+   "G:\\MMA_DOCUMENT\\myp\\cal\\comparative_analysis\\a12.xlsx"];
+ap = Import[
+   "G:\\MMA_DOCUMENT\\myp\\cal\\comparative_analysis\\a+.xlsx"];
+an = Import[
+   "G:\\MMA_DOCUMENT\\myp\\cal\\comparative_analysis\\a-.xlsx"];
+W = Import["G:\\MMA_DOCUMENT\\myp\\cal\\comparative_analysis\\w.xlsx"];
+(*导入完毕*)
+
+(*决策矩阵规范化开始*)
+ct = {0, 0, 0, 0, 0};(*准则类型*)
+cc = {1.05, 30.5, 92.5, 55.5, 125};(*规范化基值*)
+ctmp = Table[i, {i, 1, Length[ct]}];(*构造准则id列表*)
+na1 = {getNoFN[a1[[#]][[1]], cc[[#]], ct[[#]]], a1[[#]][[2]]} & /@ 
+   ctmp;
+na2 = {getNoFN[a2[[#]][[1]], cc[[#]], ct[[#]]], a2[[#]][[2]]} & /@ 
+   ctmp;
+na3 = {getNoFN[a3[[#]][[1]], cc[[#]], ct[[#]]], a3[[#]][[2]]} & /@ 
+   ctmp;
+na4 = {getNoFN[a4[[#]][[1]], cc[[#]], ct[[#]]], a4[[#]][[2]]} & /@ 
+   ctmp;
+na5 = {getNoFN[a5[[#]][[1]], cc[[#]], ct[[#]]], a5[[#]][[2]]} & /@ 
+   ctmp;
+na6 = {getNoFN[a6[[#]][[1]], cc[[#]], ct[[#]]], a6[[#]][[2]]} & /@ 
+   ctmp;
+na7 = {getNoFN[a7[[#]][[1]], cc[[#]], ct[[#]]], a7[[#]][[2]]} & /@ 
+   ctmp;
+na8 = {getNoFN[a8[[#]][[1]], cc[[#]], ct[[#]]], a8[[#]][[2]]} & /@ 
+   ctmp;
+na9 = {getNoFN[a9[[#]][[1]], cc[[#]], ct[[#]]], a9[[#]][[2]]} & /@ 
+   ctmp;
+na10 = {getNoFN[a10[[#]][[1]], cc[[#]], ct[[#]]], a10[[#]][[2]]} & /@ 
+   ctmp;
+na11 = {getNoFN[a11[[#]][[1]], cc[[#]], ct[[#]]], a11[[#]][[2]]} & /@ 
+   ctmp;
+na12 = {getNoFN[a12[[#]][[1]], cc[[#]], ct[[#]]], a12[[#]][[2]]} & /@ 
+   ctmp;
+nap = {getNoFN[ap[[#]][[1]], cc[[#]], ct[[#]]], ap[[#]][[2]]} & /@ 
+   ctmp;
+nan = {getNoFN[an[[#]][[1]], cc[[#]], ct[[#]]], an[[#]][[2]]} & /@ 
+   ctmp;
+(*决策矩阵规范化结束*)
+
+(*开始执行程序*)
+(*首先设定参数*)
+cez = 0.2;(*决策偏好*)
+m = 12;(*方案个数*)
+n = 5;(*准则个数*)
+(*第一子步：计算准则权重*)
+ws = W[[1]][[1]];(*权重向量*)
+
+(*第二子步：计算各方案在各准则下与正负理想解之间的距离*)
+cs = Table[i, {i, 1, n}];(*首先构造准则id列表，降低计算压力*)
+d1 = {myCEz[na1[[#]], nap[[#]], cez] & /@ cs,(*na1-nap*)
+  myCEz[na2[[#]], nap[[#]], cez] & /@ cs,(*na2-nap*)
+  myCEz[na3[[#]], nap[[#]], cez] & /@ cs,(*na3-nap*)
+  myCEz[na4[[#]], nap[[#]], cez] & /@ cs,(*na4-nap*)
+  myCEz[na5[[#]], nap[[#]], cez] & /@ cs,(*na5-nap*)
+  myCEz[na6[[#]], nap[[#]], cez] & /@ cs,(*na6-nap*)
+  myCEz[na7[[#]], nap[[#]], cez] & /@ cs,(*na7-nap*)
+  myCEz[na8[[#]], nap[[#]], cez] & /@ cs,(*na8-nap*)
+  myCEz[na9[[#]], nap[[#]], cez] & /@ cs,(*na9-nap*)
+  myCEz[na10[[#]], nap[[#]], cez] & /@ cs,(*na10-nap*)
+  myCEz[na11[[#]], nap[[#]], cez] & /@ cs,(*na11-nap*)
+  myCEz[na12[[#]], nap[[#]], cez] & /@ cs(*na12-nap*)}(*各方案与正理想解*);
+td0 = myCEz[nap[[#]], nan[[#]], cez] & /@ cs;
+d0 = Table[td0, m](*各方案与正理想解*);
+
+(*第三子步：计算各方案之S与R*)
+as = Table[i, {i, 1, m}];(*首先构造方案id列表，降低计算压力*)
+ts = d1[[#]]/d0[[#]] & /@ as;
+tr = getPoNE[ts[[#]], ws] & /@ as;
+
+S = ts.ws;
+R = Max[tr[[#]]] & /@ as;
+
+(*第四子步：计算各方案之Q*)
+(*第一分步：获取s0/s1与r0/r1*)
+s1 = Min[S];
+s0 = Max[S];
+r1 = Min[R];
+r0 = Max[R];
+
+(*第二分步：执行所在子步之主体任务*)
+v = 0.5;(*VIKOR内部参数*)
+Q = v*((S[[#]] - s1)/(s0 - s1)) + (1 - 
+       v)*((R[[#]] - r1)/(r0 - r1)) & /@ as;
+
+(*第五子步：执行排序*)
+vs1 = Sort[{#, S[[#]]} & /@ as, #1[[2]] > #2[[2]] &][[#, 1]] & /@ as
+vs2 = Sort[{#, R[[#]]} & /@ as, #1[[2]] > #2[[2]] &][[#, 1]] & /@ as
+vs3 = Sort[{#, Q[[#]]} & /@ as, #1[[2]] > #2[[2]] &][[#, 1]] & /@ as
+{vs1, vs2, vs3} // TableForm;
