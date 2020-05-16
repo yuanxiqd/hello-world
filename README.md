@@ -22,9 +22,10 @@ __Dong Qiao__ received the B.S. degree in Electronic Business from Zhengzhou Uni
 __November 2017 - March 2018__ Participation in designing and composing the research proposal of National Science Foundation of China (NSFC), especially composing overseas and domestic research status and part of research contents.
 
 ## 4. Publications
-1. Dong Qiao, Xiao-kang Wang, Jian-qiang Wang, Ke Chen, Cross entropy for discrete Z-numbers and its application in multi-criteria decision-making, International Journal of Fuzzy Systems, https://doi.org/10.1007/s40815-019-00674-2 (SCI, JCR: Q2, IF: 3.085)
-2. Dong Qiao, Kai-wen Shen, Jian-qiang Wang, Tie-li Wang, Multi-criteria PROMETHEE method based on possibility degree with Z-numbers under uncertain linguistic environment, Journal of Ambient Intelligence and  Humanized Computing, https://doi.org/10.1007/s12652-019-01251-z,2019 (SCI, JCR: Q3, IF: 1.91)
-3. Kai-wen Shen, Xiao-kang Wang, Dong Qiao and Jian-qiang Wang, Extended Z-MABAC method based on regret theory and directed distance for regional circular economy development program selection with Z-information, IEEE Transactions on Fuzzy Systems, https://doi.org/10.1109/TFUZZ.2019.2923948 (SCI, JCR: Q1, IF: 8.759)
+1. __Dong Qiao__, Yi-ting Wang, Jian-qiang Wang, Hanyang Luo, Lin Li. Likelihood-based qualitative flexible approach under Z-evaluation, Computational and Applied Mathematics, 2020 (SCI, JCR: Q2, IF: 1.265) – Accepted
+2. __Dong Qiao__, Xiao-kang Wang, Jian-qiang Wang, Ke Chen, Cross entropy for discrete Z-numbers and its application in multi-criteria decision-making, International Journal of Fuzzy Systems, https://doi.org/10.1007/s40815-019-00674-2 (SCI, JCR: Q2, IF: 3.085)
+3. __Dong Qiao__, Kai-wen Shen, Jian-qiang Wang, Tie-li Wang, Multi-criteria PROMETHEE method based on possibility degree with Z-numbers under uncertain linguistic environment, Journal of Ambient Intelligence and  Humanized Computing, https://doi.org/10.1007/s12652-019-01251-z,2019 (SCI, JCR: Q3, IF: 1.91)
+4. Kai-wen Shen, Xiao-kang Wang, __Dong Qiao__ and Jian-qiang Wang, Extended Z-MABAC method based on regret theory and directed distance for regional circular economy development program selection with Z-information, IEEE Transactions on Fuzzy Systems, https://doi.org/10.1109/TFUZZ.2019.2923948 (SCI, JCR: Q1, IF: 8.759)
 
 ## 5. Hobbies
 * Listening music
@@ -35,4 +36,4 @@ __November 2017 - March 2018__ Participation in designing and composing the rese
 * Email: lyqiaodong@csu.edu.cn
 * Address: No. 932, South Lushan Road, Changsha, Hunan Province, P.R. China
 
-## @copyright
+## Copyright 2017-2020 DONG QIAO
