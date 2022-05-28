@@ -33,7 +33,7 @@ __November 2017 - March 2018__ Participation in designing and composing the rese
 * Climbing (e.g., Mount Hua in Shaanxi Province of PRC, Mount Heng in Hunan Province of PRC, and Mount Yuelu in Hunan Province of PRC)
 
 ## 6. Contact Information
-* Email: lyqiaodong@csu.edu.cn
+* Email: lyqiaodong@outlook.com
 * Address: No. 932, South Lushan Road, Changsha, Hunan Province, P.R. China
 
-## Copyright 2017-2020 DONG QIAO
+## Copyright 2017-2022 DONG QIAO
